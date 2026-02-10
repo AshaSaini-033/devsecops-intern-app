@@ -1,0 +1,30 @@
+# dependencies
+node_modules
+npm-debug.log
+
+# git
+.git
+.gitignore
+
+# env secrets
+.env
+
+# logs
+logs
+*.log
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# docker files (optional)
+Dockerfile
+.dockerignore
+
+# tests (if not needed in prod)
+tests
+coverage
+
+# IDE
+.vscode
+.idea
