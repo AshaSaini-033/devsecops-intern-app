@@ -1,19 +1,18 @@
 # DevSecOps Intern App
 
-A simple Node.js and Express application used to practice DevSecOps concepts around application security, containerization, deployment, and infrastructure automation.
+A simple Node.js and Express application used to practice DevSecOps concepts around application security, containerization, CI/CD, deployment, and monitoring.
 
 ## Overview
 
-The project is a small Task Manager API with basic security and operational features. It provides task-related API routes, a health-check endpoint, request logging, security headers, and rate limiting.
+The project is a Task Manager API with basic security and operational features. It provides task-related API routes, a health-check endpoint, request logging, security headers, and rate limiting.
 
 ## Tech Stack
 
 - Node.js
 - Express.js
 - Docker
-- Terraform
-- AWS EC2
 - Jenkins
+- AWS
 - Helmet
 - Morgan
 - Express Rate Limit
@@ -28,27 +27,29 @@ The project is a small Task Manager API with basic security and operational feat
 - Request logging using Morgan
 - Environment-based configuration using dotenv
 
-## DevSecOps Components
+## DevSecOps Workflow
 
-### Application Security
+### CI/CD Pipeline
 
-- **Helmet** is used to add security-related HTTP headers.
-- **Express Rate Limit** limits incoming requests to help protect the API from excessive traffic.
-- Environment variables are kept outside the source code using `.env`.
+Jenkins is used to automate the application delivery workflow, including build, validation, containerization, and deployment steps.
+
+### Security
+
+- **Helmet** adds security-related HTTP headers.
+- **Express Rate Limit** limits incoming API requests.
+- Security and code-quality checks are included in the CI/CD workflow.
 
 ### Containerization
 
-The application is structured to run as a containerized Node.js service using Docker.
+The application is containerized using Docker to provide a consistent environment for deployment.
 
-### Infrastructure Automation
+### Deployment
 
-Terraform is used to define an AWS EC2 instance for the Jenkins server along with its security group.
+The application is deployed through the CI/CD pipeline after the required validation and security checks.
 
-The Terraform configuration uses the AWS `ap-south-1` region and defines access for SSH and Jenkins on port `8080`.
+### Monitoring
 
-### CI/CD
-
-The project is designed around a Jenkins-based delivery workflow for automating application build and deployment steps.
+The application includes a health-check endpoint and request logging to help monitor application availability and activity.
 
 ## Project Structure
 
@@ -58,8 +59,6 @@ devsecops-intern-app/
 │   ├── app.js
 │   ├── server.js
 │   └── routes/
-├── terraform/
-│   └── main.tf
 ├── package.json
 ├── .dockerignore
 └── README.md
@@ -104,37 +103,11 @@ Expected response:
 }
 ```
 
-## Terraform
-
-Move to the Terraform directory:
-
-```bash
-cd terraform
-```
-
-Initialize Terraform:
-
-```bash
-terraform init
-```
-
-Review the infrastructure plan:
-
-```bash
-terraform plan
-```
-
-Apply the configuration after updating the required AWS and SSH key settings:
-
-```bash
-terraform apply
-```
-
-> Do not commit private keys, AWS credentials, or environment secrets to the repository.
+> Do not commit private keys, credentials, or environment secrets to the repository.
 
 ## Learning Goals
 
-This project demonstrates the basic workflow of combining application development with security, containerization, CI/CD, and infrastructure automation.
+This project demonstrates a basic DevSecOps workflow combining application development, security checks, Docker containerization, CI/CD, deployment, and monitoring.
 
 ## Author
 
