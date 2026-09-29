@@ -32,17 +32,17 @@ pipeline {
             }
         }
 
-        stage("Deploy") {
+        stage("Deploy to Kubernetes") {
             steps {
-                sh "docker rm -f $CONTAINER_NAME || true"
-                sh "docker run -d --restart unless-stopped --name $CONTAINER_NAME -p 3000:3000 $IMAGE_NAME:$BUILD_NUMBER"
+                sh "kubectl apply -f k8s/"
+                sh "kubectl rollout status deployment/devsecops-intern-app --timeout=120s"
             }
         }
 
         stage("Health Check") {
             steps {
-                sh "sleep 5"
-                sh "curl --fail http://localhost:3000/health"
+                sh "kubectl get pods -l app=devsecops-intern-app"
+                sh "kubectl get service devsecops-intern-app"
             }
         }
     }
