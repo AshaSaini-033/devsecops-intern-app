@@ -1,55 +1,81 @@
 # DevSecOps Intern App
 
-A simple Node.js and Express application used to practice DevSecOps concepts around application security, containerization, CI/CD, deployment, and monitoring.
+A Node.js and Express Task Manager API deployed through an automated DevSecOps workflow using Jenkins, Docker, and Kubernetes, with security checks and Prometheus/Grafana monitoring.
 
-## Overview
+## What this project does
 
-The project is a Task Manager API with basic security and operational features. It provides task-related API routes, a health-check endpoint, request logging, security headers, and rate limiting.
+A code change moves through one delivery flow:
+
+`GitHub → Jenkins → Validation → Security Scan → Docker Build → Kubernetes → Monitoring`
+
+The application exposes health and metrics endpoints so Kubernetes and Prometheus can observe the running service.
 
 ## Tech Stack
 
-- Node.js
-- Express.js
+- Node.js / Express.js
 - Docker
 - Jenkins
-- AWS
+- Kubernetes
+- Trivy
+- Prometheus
+- Grafana
 - Helmet
-- Morgan
 - Express Rate Limit
+- Morgan
 
-## Application Features
+## CI/CD
 
-- REST API built with Express.js
-- Task management routes
-- `/health` endpoint for checking application status
-- HTTP security headers using Helmet
-- Request rate limiting
-- Request logging using Morgan
-- Environment-based configuration using dotenv
+The Jenkins pipeline:
 
-## DevSecOps Workflow
+1. Checks out the latest code.
+2. Installs dependencies and runs dependency validation.
+3. Builds the Docker image.
+4. Scans the image with Trivy for HIGH/CRITICAL vulnerabilities.
+5. Applies the Kubernetes manifests.
+6. Waits for the deployment rollout and checks the running pods/services.
 
-### CI/CD Pipeline
+Pipeline definition: `Jenkinsfile`
 
-Jenkins is used to automate the application delivery workflow, including build, validation, containerization, and deployment steps.
+## Security
 
-### Security
+Application-level controls include:
 
-- **Helmet** adds security-related HTTP headers.
-- **Express Rate Limit** limits incoming API requests.
-- Security and code-quality checks are included in the CI/CD workflow.
+- Helmet security headers
+- Express rate limiting
+- Dependency audit in CI
+- Container image vulnerability scanning with Trivy
 
-### Containerization
+## Kubernetes
 
-The application is containerized using Docker to provide a consistent environment for deployment.
+The application is deployed with native Kubernetes manifests:
 
-### Deployment
+- `k8s/deployment.yaml` — application deployment with 2 replicas and resource limits.
+- `k8s/service.yaml` — internal service for routing traffic to application pods.
+- Liveness and readiness probes use `/health`.
 
-The application is deployed through the CI/CD pipeline after the required validation and security checks.
+No Helm is used.
 
-### Monitoring
+## Monitoring
 
-The application includes a health-check endpoint and request logging to help monitor application availability and activity.
+The application exposes Prometheus metrics at:
+
+`/metrics`
+
+Metrics are generated with `prom-client`, including default Node.js process metrics and HTTP request counts.
+
+Prometheus is configured in `monitoring/prometheus.yml` and `k8s/monitoring.yaml` to scrape the application.
+
+Grafana is deployed alongside Prometheus and is configured to use Prometheus as its data source for dashboards and visualization.
+
+Monitoring flow:
+
+`Application → /metrics → Prometheus → Grafana`
+
+## Application Health
+
+`/health` returns the application status and is used by Kubernetes readiness and liveness probes.
+
+Morgan provides request logs for application activity.
 
 ## Project Structure
 
@@ -58,56 +84,44 @@ devsecops-intern-app/
 ├── src/
 │   ├── app.js
 │   ├── server.js
+│   ├── metrics.js
 │   └── routes/
+├── k8s/
+│   ├── deployment.yaml
+│   ├── service.yaml
+│   └── monitoring.yaml
+├── monitoring/
+│   └── prometheus.yml
+├── Dockerfile
+├── Jenkinsfile
 ├── package.json
-├── .dockerignore
 └── README.md
 ```
 
-## Running Locally
-
-### 1. Clone the repository
-
-```bash
-git clone https://github.com/AshaSaini-033/devsecops-intern-app.git
-cd devsecops-intern-app
-```
-
-### 2. Install dependencies
+## Local Setup
 
 ```bash
 npm install
-```
-
-### 3. Start the application
-
-```bash
 npm start
 ```
 
-The application runs on port `3000` by default.
+Application:
 
-### 4. Check application health
+`http://localhost:3000`
 
-Open:
+Health:
 
-```
-http://localhost:3000/health
-```
+`http://localhost:3000/health`
 
-Expected response:
+Metrics:
 
-```json
-{
-  "status": "UP"
-}
-```
+`http://localhost:3000/metrics`
 
-> Do not commit private keys, credentials, or environment secrets to the repository.
+## Note
 
-## Learning Goals
+The Kubernetes manifests assume a cluster with the required access and an application image available to the cluster.
 
-This project demonstrates a basic DevSecOps workflow combining application development, security checks, Docker containerization, CI/CD, deployment, and monitoring.
+Do not commit credentials, private keys, or environment secrets.
 
 ## Author
 
